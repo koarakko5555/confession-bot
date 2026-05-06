@@ -53,23 +53,25 @@ const commands = [
   },
 ];
 
-const res = await fetch(
-  `https://discord.com/api/v10/applications/${APPLICATION_ID}/commands`,
-  {
-    method: "PUT",
-    headers: {
-      Authorization: `Bot ${BOT_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(commands),
-  }
-);
+(async () => {
+  const res = await fetch(
+    `https://discord.com/api/v10/applications/${APPLICATION_ID}/commands`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bot ${BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commands),
+    }
+  );
 
-if (res.ok) {
-  const data = await res.json();
-  console.log("コマンド登録成功:", JSON.stringify(data, null, 2));
-} else {
-  const err = await res.text();
-  console.error("コマンド登録失敗:", res.status, err);
-  process.exit(1);
-}
+  if (res.ok) {
+    const data = await res.json();
+    console.log("コマンド登録成功:", JSON.stringify(data, null, 2));
+  } else {
+    const err = await res.text();
+    console.error("コマンド登録失敗:", res.status, err);
+    process.exit(1);
+  }
+})();
