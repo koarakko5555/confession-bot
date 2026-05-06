@@ -94,14 +94,20 @@ export default {
       const options: Array<{ name: string; value: string }> =
         interaction.data.options ?? [];
 
-      const content = options.find((o) => o.name === "hansei")?.value ?? "";
+      const content = options.find((o) => o.name === "hansei")?.value;
+      if (!content) {
+        return Response.json({
+          type: 4,
+          data: { content: "反省文を入力してください。", flags: 64 },
+        });
+      }
       const attachmentId = options.find((o) => o.name === "image")?.value;
       const attachment =
         attachmentId != null
           ? interaction.data.resolved?.attachments?.[attachmentId]
           : undefined;
 
-      const message = `**迷える鹿さんの懺悔**\n${content}`;
+      const message = `**迷える鹿さんの懺悔**\n${content as string}`;
 
       try {
         await postToChannel(
