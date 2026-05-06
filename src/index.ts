@@ -3,6 +3,7 @@ export interface Env {
   DISCORD_BOT_TOKEN: string;
   DISCORD_APPLICATION_ID: string;
   CONFESSION_CHANNEL_ID: string;
+  ZANGE_TEMP: KVNamespace;
 }
 
 function hexToUint8Array(hex: string): Uint8Array {
@@ -89,24 +90,68 @@ export default {
       return Response.json({ type: 1 });
     }
 
-    // /zange コマンド
+    // /zange コマンド → モーダルを表示
     if (interaction.type === 2 && interaction.data?.name === "zange") {
       const options: Array<{ name: string; value: string }> =
         interaction.data.options ?? [];
-
-      const content = options.find((o) => o.name === "hansei")?.value;
-      if (!content) {
-        return Response.json({
-          type: 4,
-          data: { content: "反省文を入力してください。", flags: 64 },
-        });
-      }
 
       const attachmentId = options.find((o) => o.name === "image")?.value;
       const attachment =
         attachmentId != null
           ? interaction.data.resolved?.attachments?.[attachmentId]
           : undefined;
+
+      const userId: string =
+        interaction.member?.user?.id ?? interaction.user?.id;
+
+      if (attachment) {
+        await env.ZANGE_TEMP.put(
+          `pending_${userId}`,
+          attachment.proxy_url ?? attachment.url,
+          { expirationTtl: 600 }
+        );
+      } else {
+        await env.ZANGE_TEMP.delete(`pending_${userId}`);
+      }
+
+      return Response.json({
+        type: 9, // MODAL
+        data: {
+          custom_id: "zange_modal",
+          title: "懺悔",
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 4, // TEXT_INPUT
+                  custom_id: "content",
+                  label: "反省の内容",
+                  style: 2, // PARAGRAPH（複数行）
+                  placeholder: "懺悔の内容を入力してください...",
+                  required: true,
+                  min_length: 1,
+                  max_length: 1000,
+                },
+              ],
+            },
+          ],
+        },
+      });
+    }
+
+    // モーダル送信
+    if (interaction.type === 5 && interaction.data?.custom_id === "zange_modal") {
+      const userId: string =
+        interaction.member?.user?.id ?? interaction.user?.id;
+
+      const content: string =
+        interaction.data.components[0].components[0].value;
+
+      const imageUrl = await env.ZANGE_TEMP.get(`pending_${userId}`);
+      if (imageUrl) {
+        await env.ZANGE_TEMP.delete(`pending_${userId}`);
+      }
 
       const message = `**迷える鹿さんの懺悔**\n${content}`;
 
@@ -115,7 +160,7 @@ export default {
           env.CONFESSION_CHANNEL_ID,
           env.DISCORD_BOT_TOKEN,
           message,
-          attachment?.url
+          imageUrl ?? undefined
         );
       } catch (e) {
         console.error(e);

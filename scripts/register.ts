@@ -44,13 +44,6 @@ const commands = [
         type: 11, // ATTACHMENT
         required: false,
       },
-      {
-        name: "hansei",
-        description: "反省の内容",
-        name_localizations: { ja: "反省文" },
-        type: 3, // STRING
-        required: false,
-      },
     ],
   },
 ];
