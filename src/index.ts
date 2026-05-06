@@ -128,7 +128,7 @@ export default {
                   custom_id: "content",
                   label: "反省の内容",
                   style: 2, // PARAGRAPH（複数行）
-                  placeholder: "懺悔の内容を入力してください...",
+                  placeholder: "誰にでもミスはあるものです",
                   required: true,
                   min_length: 1,
                   max_length: 1000,
