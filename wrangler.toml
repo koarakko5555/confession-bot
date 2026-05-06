@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+[[kv_namespaces]]
+binding = "ZANGE_TEMP"
+id = "5bdd07ce3c8c4d05bd056893ff7c3d6d"
+
 [vars]
 # 本番環境の値は `wrangler secret put` で設定する
 # DISCORD_PUBLIC_KEY
