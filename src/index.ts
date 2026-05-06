@@ -101,11 +101,7 @@ export default {
           ? interaction.data.resolved?.attachments?.[attachmentId]
           : undefined;
 
-      const user = interaction.member?.user ?? interaction.user;
-      const displayName: string =
-        user.global_name ?? user.username ?? "名無し";
-
-      const message = `**${displayName}の懺悔**\n${content}`;
+      const message = `**迷える鹿さんの懺悔**\n${content}`;
 
       try {
         await postToChannel(
